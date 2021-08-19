@@ -1,17 +1,17 @@
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import "./App.css";
+import Login from "./pages/Login";
+import Playlist from "./pages/Playlist";
 
 function App() {
   return (
     <Router>
       <Switch>
         <Route exact path="/create-playlist">
-          <h1>Playlist</h1>
-          <Link to="/">Pindah</Link>
+          <Playlist />
         </Route>
         <Route exact path="/">
-          <h1>Home</h1>
-          <Link to="/create-playlist">Pindah</Link>
+          <Login />
         </Route>
       </Switch>
     </Router>
