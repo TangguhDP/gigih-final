@@ -6,6 +6,7 @@ type InputSearchPropsType = {
   name: string;
   onChange: React.ChangeEventHandler<HTMLInputElement> | undefined;
   className?: string;
+  placeholder?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
 };
 
@@ -15,6 +16,7 @@ export default function InputSearch({
   onChange,
   onClick,
   className,
+  placeholder,
 }: InputSearchPropsType) {
   return (
     <div className={`w-full flex flex-row justify-between ${className}`}>
@@ -23,6 +25,7 @@ export default function InputSearch({
         id={name}
         value={value}
         onChange={onChange}
+        placeholder={placeholder}
         className="w-3/4 text-lg px-1 outline-none rounded-md shadow-md"
       />
       <TextButton

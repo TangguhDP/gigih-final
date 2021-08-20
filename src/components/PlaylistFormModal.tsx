@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import TextInputLabel from "./TextInputLabel";
 import TextAreaLabel from "./TextAreaLabel";
 import TextButton from "./TextButton";
+import { useAppSelector } from "../data/hooks";
 
 type PlaylistFormModalPropsType = {
   isShow: boolean;
@@ -16,6 +17,7 @@ export default function PlaylistFormModal({
     title: "",
     description: "",
   });
+  const playlist = useAppSelector((state) => state.playlistData.playlist);
 
   const handleOnChange = (input: any) => {
     const { name, value } = input.target;
@@ -53,11 +55,13 @@ export default function PlaylistFormModal({
               name="title"
               value={playlistForm.title}
               onChange={handleOnChange}
+              placeholder="Playlist Title"
             />
             <TextAreaLabel
               label="PLAYLIST DESCRIPTION"
               name="description"
               value={playlistForm.description}
+              placeholder="Playlist Description"
               onChange={handleOnChange}
             />
             <TextButton
@@ -68,15 +72,29 @@ export default function PlaylistFormModal({
             />
             <div className="flex-grow flex flex-col overflow-auto w-full p-2 border-2 border-gray-400 rounded-md relative">
               <ol className="list-inside">
-                <li className="flex items-center justify-between space-x-2">
-                  <span className="truncate text-base flex-grow">
-                    1.
-                    LaguLaguLaguLaguLaguLaguLaguLaguLaguLaguLaguLaguLaguLaguLaguLaguLagu
-                  </span>
-                  <button className="transition duration-500 ease-in-out text-white border-2 rounded-md shadow-md tracking-wider p-1 text-xs bg-green-600 border-green-600 font-bold hover:border-white hover:bg-green-700">
-                    DROP
-                  </button>
-                </li>
+                {playlist.length > 0 ? (
+                  playlist.map((track, i) => {
+                    return (
+                      <li
+                        key={i}
+                        className="flex items-center justify-between space-x-2"
+                      >
+                        <span className="truncate text-base flex-grow">
+                          {i + 1}. {track.title}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => alert(`Remove ${track.trackURI} `)}
+                          className="transition duration-500 ease-in-out text-white border-2 rounded-md shadow-md tracking-wider p-1 text-xs bg-green-600 border-green-600 font-bold hover:border-white hover:bg-green-700"
+                        >
+                          REMOVE
+                        </button>
+                      </li>
+                    );
+                  })
+                ) : (
+                  <span className="text-center">Add some songs</span>
+                )}
               </ol>
             </div>
           </form>

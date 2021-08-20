@@ -6,6 +6,7 @@ type TextInputLabelPropsType = {
   label: string;
   onChange: React.ChangeEventHandler<HTMLInputElement> | undefined;
   className?: string;
+  placeholder?: string;
 };
 
 export default function TextInputLabel({
@@ -14,6 +15,7 @@ export default function TextInputLabel({
   onChange,
   label,
   className,
+  placeholder,
 }: TextInputLabelPropsType) {
   return (
     <div className={`flex flex-col space-y-2 items-start ${className}`}>
@@ -24,6 +26,7 @@ export default function TextInputLabel({
         value={value}
         onChange={onChange}
         autoComplete="off"
+        placeholder={placeholder}
         className="w-full text-lg px-1 outline-none rounded-md shadow-md h-12 border-2 border-gray-200"
       />
     </div>
