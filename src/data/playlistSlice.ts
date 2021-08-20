@@ -5,9 +5,7 @@ export type selectedSong = {
   trackURI: string;
 };
 
-const playlist: Array<selectedSong> = [
-  { title: "Halo Halo Bandung", trackURI: "tada" },
-];
+const playlist: Array<selectedSong> = [];
 
 const initialState = {
   playlist: playlist,
@@ -24,10 +22,14 @@ const playlistSlice = createSlice({
       const temp = state.playlist.filter(
         (track) => track.trackURI !== action.payload.trackURI
       );
+
       state.playlist = [...temp];
+    },
+    onClear: (state) => {
+      state.playlist = [];
     },
   },
 });
 
-export const { onAdd, onRemove } = playlistSlice.actions;
+export const { onAdd, onRemove, onClear } = playlistSlice.actions;
 export default playlistSlice.reducer;

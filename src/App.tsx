@@ -20,8 +20,6 @@ function App() {
 
   const setToken = () => {
     const params = getHashParams();
-    console.log(params);
-
     dispatch(setAccessToken(params.access_token));
   };
 

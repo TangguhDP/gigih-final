@@ -5,6 +5,7 @@ import ProfileSection from "../components/ProfileSection";
 import SongCard from "../components/SongCard";
 import TextButton from "../components/TextButton";
 import { useAppDispatch, useAppSelector } from "../data/hooks";
+import { onAdd, onRemove } from "../data/playlistSlice";
 import { setUser } from "../data/userSlice";
 
 export default function Playlist() {
@@ -16,6 +17,7 @@ export default function Playlist() {
     (state) => state.userData.access_token
   );
   const user = useAppSelector((state) => state.userData.user);
+  const playlist = useAppSelector((state) => state.playlistData.playlist);
 
   useEffect(() => {
     getUser();
@@ -42,11 +44,13 @@ export default function Playlist() {
 
   return (
     <div className="bg-gray-600 mx-auto my-0 max-w-xl h-screen flex flex-col pt-8 pb-2 px-4 relative">
-      <ProfileSection
-        imgURL={user.images[0].url}
-        profileURL={user.external_urls.spotify}
-        username={user.display_name}
-      />
+      {user.display_name && (
+        <ProfileSection
+          imgURL={user?.images[0].url}
+          profileURL={user?.external_urls.spotify}
+          username={user?.display_name}
+        />
+      )}
       <PlaylistFormModal isShow={showModal} setShow={setShowModal} />
       <TextButton
         name="show-playlist"
@@ -91,9 +95,15 @@ export default function Playlist() {
                   albumTitle={track.album.name}
                   artistName={track.artists[0].name}
                   imgURL={track.album.images[0].url}
-                  selected={true}
-                  onSelected={() => alert("selected")}
-                  onDeselected={() => alert("deselected")}
+                  selected={playlist.some(
+                    (data) => data.trackURI === track.uri
+                  )}
+                  onSelected={() =>
+                    dispatch(onAdd({ title: track.name, trackURI: track.uri }))
+                  }
+                  onDeselected={() =>
+                    dispatch(onRemove({ trackURI: track.uri }))
+                  }
                   songTitle={track.name}
                 />
               );

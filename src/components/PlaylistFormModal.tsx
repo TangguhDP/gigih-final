@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import TextInputLabel from "./TextInputLabel";
 import TextAreaLabel from "./TextAreaLabel";
 import TextButton from "./TextButton";
-import { useAppSelector } from "../data/hooks";
+import { useAppDispatch, useAppSelector } from "../data/hooks";
+import { onRemove, onClear } from "../data/playlistSlice";
 
 type PlaylistFormModalPropsType = {
   isShow: boolean;
@@ -13,11 +14,16 @@ export default function PlaylistFormModal({
   isShow,
   setShow,
 }: PlaylistFormModalPropsType) {
+  const dispatch = useAppDispatch();
   const [playlistForm, setPlaylistForm] = useState({
     title: "",
     description: "",
   });
   const playlist = useAppSelector((state) => state.playlistData.playlist);
+  const user_access_token = useAppSelector(
+    (state) => state.userData.access_token
+  );
+  const user = useAppSelector((state) => state.userData.user);
 
   const handleOnChange = (input: any) => {
     const { name, value } = input.target;
@@ -26,6 +32,9 @@ export default function PlaylistFormModal({
 
   const handleOnSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const playlist = await createPlaylist();
+    console.log(playlist);
+    addTrackToPlaylist(playlist.id);
     alert("Playlist created");
     clearState();
   };
@@ -35,6 +44,43 @@ export default function PlaylistFormModal({
       title: "",
       description: "",
     });
+    dispatch(onClear());
+  };
+
+  const createPlaylist = () => {
+    return fetch(`https://api.spotify.com/v1/users/${user.id}/playlists`, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + user_access_token,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        name: playlistForm.title,
+        description: playlistForm.description,
+        public: false,
+      }),
+    })
+      .then((response) => response.json())
+      .catch((err) => alert(err));
+  };
+
+  const addTrackToPlaylist = (playlistID: string) => {
+    const tracksSelected = playlist.map((track) => track.trackURI);
+
+    fetch(`https://api.spotify.com/v1/playlists/${playlistID}/tracks`, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + user_access_token,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        uris: tracksSelected,
+      }),
+    })
+      .then((response) => response.json())
+      .catch((err) => alert(err));
   };
 
   return (
@@ -43,7 +89,7 @@ export default function PlaylistFormModal({
         <>
           <div
             onClick={() => setShow(false)}
-            className="bg-black opacity-25 absolute h-screen w-full z-10 inset-0"
+            className="bg-black opacity-40 absolute h-screen w-full z-10 inset-0"
           ></div>
           <form
             onSubmit={handleOnSubmit}
@@ -56,6 +102,7 @@ export default function PlaylistFormModal({
               value={playlistForm.title}
               onChange={handleOnChange}
               placeholder="Playlist Title"
+              required={true}
             />
             <TextAreaLabel
               label="PLAYLIST DESCRIPTION"
@@ -63,6 +110,7 @@ export default function PlaylistFormModal({
               value={playlistForm.description}
               placeholder="Playlist Description"
               onChange={handleOnChange}
+              required={true}
             />
             <TextButton
               type="submit"
@@ -77,14 +125,16 @@ export default function PlaylistFormModal({
                     return (
                       <li
                         key={i}
-                        className="flex items-center justify-between space-x-2"
+                        className="flex items-center justify-between space-x-2 mb-2"
                       >
                         <span className="truncate text-base flex-grow">
                           {i + 1}. {track.title}
                         </span>
                         <button
                           type="button"
-                          onClick={() => alert(`Remove ${track.trackURI} `)}
+                          onClick={() =>
+                            dispatch(onRemove({ trackURI: track.trackURI }))
+                          }
                           className="transition duration-500 ease-in-out text-white border-2 rounded-md shadow-md tracking-wider p-1 text-xs bg-green-600 border-green-600 font-bold hover:border-white hover:bg-green-700"
                         >
                           REMOVE
