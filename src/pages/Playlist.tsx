@@ -51,8 +51,14 @@ export default function Playlist() {
           username={user?.display_name}
         />
       )}
-      <PlaylistFormModal isShow={showModal} setShow={setShowModal} />
+      <PlaylistFormModal
+        id="playlist-form"
+        name="playlist-form"
+        isShow={showModal}
+        setShow={setShowModal}
+      />
       <TextButton
+        id="show-playlist"
         name="show-playlist"
         onClick={() => setShowModal(true)}
         className="bg-green-600 border-green-600 font-bold hover:border-white hover:bg-green-700 w-full mb-2"

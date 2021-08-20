@@ -8,11 +8,15 @@ import { onRemove, onClear } from "../data/playlistSlice";
 type PlaylistFormModalPropsType = {
   isShow: boolean;
   setShow: Function;
+  id?: string;
+  name?: string;
 };
 
 export default function PlaylistFormModal({
   isShow,
   setShow,
+  id,
+  name
 }: PlaylistFormModalPropsType) {
   const dispatch = useAppDispatch();
   const [playlistForm, setPlaylistForm] = useState({
@@ -92,6 +96,8 @@ export default function PlaylistFormModal({
             className="bg-black opacity-40 absolute h-screen w-full z-10 inset-0"
           ></div>
           <form
+            id={id}
+            name={name}
             onSubmit={handleOnSubmit}
             style={{ height: 600 }}
             className="absolute w-5/6 bg-white z-20 inset-0 top-20 mx-auto my-0 rounded-md shadow-lg p-4 flex flex-col space-y-4"

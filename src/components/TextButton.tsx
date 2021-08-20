@@ -2,7 +2,8 @@ import React from "react";
 
 type TextButtonPropsType = {
   value?: string;
-  name: string;
+  name?: string;
+  id?: string;
   className?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
   children?: React.ReactNode;
