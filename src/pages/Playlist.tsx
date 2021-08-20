@@ -1,14 +1,52 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import InputSearch from "../components/InputSearch";
 import PlaylistFormModal from "../components/PlaylistFormModal";
+import ProfileSection from "../components/ProfileSection";
 import SongCard from "../components/SongCard";
 import TextButton from "../components/TextButton";
+import { useAppDispatch, useAppSelector } from "../data/hooks";
+import { setUser } from "../data/userSlice";
 
 export default function Playlist() {
+  const dispatch = useAppDispatch();
   const [keyword, setKeyword] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [result, setResult] = useState<any>(null);
+  const user_access_token = useAppSelector(
+    (state) => state.userData.access_token
+  );
+  const user = useAppSelector((state) => state.userData.user);
+
+  useEffect(() => {
+    getUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user_access_token !== ""]);
+
+  const getUser = () => {
+    fetch(`https://api.spotify.com/v1/me`, {
+      headers: { Authorization: "Bearer " + user_access_token },
+    })
+      .then((response) => response.json())
+      .then((response) => {
+        dispatch(setUser(response));
+      });
+  };
+
+  const getSearchResult = () => {
+    fetch(`https://api.spotify.com/v1/search?q=${keyword}&type=track`, {
+      headers: { Authorization: "Bearer " + user_access_token },
+    })
+      .then((response) => response.json())
+      .then((response) => setResult(response.tracks));
+  };
+
   return (
     <div className="bg-gray-600 mx-auto my-0 max-w-xl h-screen flex flex-col pt-8 pb-2 px-4 relative">
+      <ProfileSection
+        imgURL={user.images[0].url}
+        profileURL={user.external_urls.spotify}
+        username={user.display_name}
+      />
       <PlaylistFormModal isShow={showModal} setShow={setShowModal} />
       <TextButton
         name="show-playlist"
@@ -37,24 +75,36 @@ export default function Playlist() {
         name="search"
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
-        onClick={() => console.log(keyword)}
+        onClick={() => getSearchResult()}
         className="mb-6"
       />
-      <span className="text-center font-bold text-white mb-2">
-        Showing 20 result of "Song Title"
-      </span>
-      <div className="flex flex-col space-y-4 overflow-y-auto">
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-      </div>
+      {result ? (
+        <>
+          <span className="text-center font-bold text-white mb-2">
+            Showing {result?.items?.length} result of {keyword}
+          </span>
+          <div className="flex flex-col space-y-4 overflow-y-auto">
+            {result.items.map((track: any, i: number) => {
+              return (
+                <SongCard
+                  key={i}
+                  albumTitle={track.album.name}
+                  artistName={track.artists[0].name}
+                  imgURL={track.album.images[0].url}
+                  selected={true}
+                  onSelected={() => alert("selected")}
+                  onDeselected={() => alert("deselected")}
+                  songTitle={track.name}
+                />
+              );
+            })}
+          </div>
+        </>
+      ) : (
+        <h3 className="text-center text-lg text-white font-bold">
+          No Tracks Show, Go Search It!
+        </h3>
+      )}
     </div>
   );
 }
